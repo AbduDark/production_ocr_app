@@ -1,261 +1,139 @@
 
-# OCR Text Extraction Service
+# OCR Service - Railway Optimized
 
-A production-ready web application for extracting text from images using multiple OCR engines.
+Production-ready OCR text extraction service optimized for Railway limited plan and Replit deployment.
 
 ## Features
 
-- **Multiple OCR Engines**: Supports EasyOCR, PaddleOCR, and Tesseract OCR
-- **Multi-language Support**: English, Japanese, and Korean text recognition
-- **High Accuracy Mode**: Uses multiple engines for maximum precision
-- **Batch Processing**: Process multiple images simultaneously
-- **Web Interface**: Modern, responsive web interface
-- **Error Handling**: Comprehensive error handling and recovery
-- **Production Ready**: Optimized for deployment and scaling
+- **Memory Optimized**: Reduced memory footprint for limited hosting
+- **Railway Ready**: Configured for Railway's free tier limitations
+- **Multiple OCR Engines**: EasyOCR, Tesseract, OpenCV fallback
+- **File Upload**: Support for PNG, JPG, JPEG, BMP (max 8MB)
+- **Real-time Progress**: Track processing status
+- **Download Results**: Get extracted text as downloadable file
 
-## Supported Image Formats
+## Quick Deploy on Replit
 
-- PNG, JPG, JPEG, BMP, TIFF, GIF, WEBP
-- Maximum file size: 16MB per image
-- Automatic image preprocessing and optimization
+1. **Fork/Upload**: Upload all files to a new Repl
+2. **Run**: Click the Run button - dependencies install automatically
+3. **Deploy**: Use Replit's Deploy feature for production
 
-## Quick Start
+## Deploy on Railway (Alternative)
 
-### 1. Download and Extract
+1. **Connect Repository**: Connect your GitHub repo to Railway
+2. **Environment Variables**: Set `SECRET_KEY` in Railway dashboard
+3. **Deploy**: Railway automatically detects Flask and deploys
 
-```bash
-# Extract the application files to your desired directory
-cd production_ocr_app
-```
-
-### 2. Install Dependencies
-
-**Option A: Automatic Installation (Recommended)**
-```bash
-chmod +x install_and_run.sh
-./install_and_run.sh
-```
-
-**Option B: Manual Installation**
-```bash
-# Install system dependencies (Ubuntu/Debian)
-sudo apt-get update
-sudo apt-get install -y tesseract-ocr tesseract-ocr-eng tesseract-ocr-jpn tesseract-ocr-kor
-sudo apt-get install -y python3-pip python3-dev libgl1-mesa-glx
-
-# Install Python dependencies
-pip3 install -r requirements.txt
-```
-
-### 3. Run the Application
+## Local Development
 
 ```bash
-python3 app.py
+# Install dependencies
+pip install -r requirements.txt
+
+# Run application
+python app.py
 ```
 
-The application will be available at `http://localhost:5000`
+## Configuration
 
-## Deployment Options
+### Environment Variables
+- `PORT`: Server port (default: 5000)
+- `SECRET_KEY`: Flask secret key for sessions
 
-### 1. Development Server (Local Testing)
-```bash
-python3 app.py
-```
-
-### 2. Production Server with Gunicorn
-```bash
-# Install Gunicorn
-pip3 install gunicorn
-
-# Run with Gunicorn
-gunicorn -w 4 -b 0.0.0.0:5000 app:app
-```
-
-### 3. Docker Deployment (Optional)
-```bash
-# Create Dockerfile
-FROM python:3.9-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN apt-get update && apt-get install -y tesseract-ocr tesseract-ocr-eng tesseract-ocr-jpn tesseract-ocr-kor libgl1-mesa-glx
-RUN pip install -r requirements.txt
-COPY . .
-EXPOSE 5000
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
-
-# Build and run
-docker build -t ocr-service .
-docker run -p 5000:5000 ocr-service
-```
-
-### 4. Replit Deployment (Recommended for Cloud)
-1. Upload files to Replit
-2. Run the application
-3. Use Replit's deployment feature for production hosting
+### Resource Limits (Railway Optimized)
+- **File Size**: 8MB maximum per file
+- **Concurrent Files**: 3 files maximum per upload
+- **Concurrent Tasks**: 2 tasks maximum
+- **Image Size**: Auto-resized to 1024px max dimension
+- **OCR Languages**: English only (memory optimization)
 
 ## API Endpoints
 
 ### POST /upload
 Upload images for OCR processing
-- **Files**: Multiple image files
-- **Mode**: "normal" or "high_accuracy"
-- **Languages**: Array of language codes ["en", "ja", "ko"]
-- **Returns**: Task ID for tracking progress
+- **Files**: Up to 3 image files (PNG, JPG, JPEG, BMP)
+- **Returns**: Task ID for progress tracking
 
 ### GET /progress/{task_id}
 Check processing progress
-- **Returns**: Progress status, percentage, and estimated time
+- **Returns**: Status, progress percentage, results count
 
 ### GET /download/{task_id}
-Download extracted text results
-- **Returns**: Text file with all extracted text
+Download extracted text
+- **Returns**: Text file with all extracted content
 
-### GET /status
-Check service status
-- **Returns**: Available OCR engines and service health
+### GET /health
+Health check endpoint for Railway
+- **Returns**: Service status and OCR availability
 
-## Configuration
+## Memory Optimization Features
 
-### Environment Variables
-```bash
-# Flask configuration
-export FLASK_ENV=production
-export SECRET_KEY=your-secret-key-here
+- **Aggressive Cleanup**: Automatic task cleanup after 30 minutes
+- **Single Engine Priority**: Uses best available OCR engine only
+- **Image Compression**: Auto-resize large images
+- **Memory Management**: Force garbage collection after processing
+- **Synchronous Processing**: Optimized for Railway's threading model
 
-# Service configuration
-export PORT=5000
-export MAX_CONTENT_LENGTH=16777216  # 16MB
+## Supported OCR Engines
 
-# OCR configuration
-export OCR_TIMEOUT=300  # 5 minutes
-```
+1. **EasyOCR** (Primary): Best accuracy, English only for memory efficiency
+2. **Tesseract** (Backup): System-dependent installation
+3. **OpenCV** (Fallback): Basic text region detection
 
-### File Structure
-```
-production_ocr_app/
-├── app.py                 # Main Flask application
-├── templates/
-│   └── index.html        # Web interface
-├── static/
-│   ├── style.css        # Styling
-│   └── script.js        # Frontend JavaScript
-├── logs/                # Application logs
-├── temp/               # Temporary file storage
-├── results/            # Results storage
-├── requirements.txt    # Python dependencies
-├── install_and_run.sh  # Installation script
-└── README.md          # This file
-```
+## Production Features
+
+- **Error Handling**: Comprehensive error responses
+- **Logging**: Production-level logging (warnings and errors only)
+- **Rate Limiting**: Built-in concurrent task limiting
+- **Security**: File validation and secure filename handling
+- **Health Monitoring**: `/health` endpoint for monitoring
+
+## Railway Deployment Notes
+
+- **Memory**: Optimized for Railway's 512MB limit
+- **Disk Usage**: No persistent file storage used
+- **Networking**: Configured for Railway's proxy setup
+- **Scaling**: Single instance optimized (no horizontal scaling needed)
 
 ## Troubleshooting
 
 ### Common Issues
 
-**1. OCR Engines Not Available**
-```bash
-# Install missing OCR engines
-pip3 install easyocr paddleocr pytesseract
+**Memory Errors on Railway**
+- Reduce image sizes before upload
+- Process fewer files simultaneously
+- Service automatically cleans up old tasks
 
-# For Tesseract system dependency
-sudo apt-get install tesseract-ocr
-```
+**OCR Engine Not Available**
+- EasyOCR installs automatically from requirements.txt
+- Tesseract requires system installation (available on Railway)
+- OpenCV fallback always available
 
-**2. OpenCV Issues**
-```bash
-# Install OpenCV dependencies
-sudo apt-get install libgl1-mesa-glx libglib2.0-0
-pip3 install opencv-python
-```
+**Upload Failures**
+- Check file size (8MB maximum)
+- Ensure valid image format (PNG, JPG, JPEG, BMP)
+- Wait for previous tasks to complete
 
-**3. Memory Issues**
-- Reduce image size before processing
-- Use normal mode instead of high accuracy
-- Process fewer images simultaneously
+### Performance Tips
 
-**4. Permission Issues**
-```bash
-# Create directories with proper permissions
-mkdir -p logs temp results
-chmod 755 logs temp results
-```
+- **Image Quality**: 300 DPI recommended for best OCR results
+- **File Format**: PNG for best quality, JPEG for smaller size
+- **Image Size**: Service auto-optimizes, but smaller images process faster
+- **Concurrent Processing**: Maximum 2 tasks to prevent memory issues
 
-### Logs and Debugging
+## Support
 
-Application logs are stored in:
-- `logs/app.log` - Main application log
-- Console output - Real-time processing information
+This application is optimized for Railway limited plans and Replit hosting. For deployment issues, check:
 
-Enable debug mode for development:
-```bash
-export FLASK_DEBUG=true
-python3 app.py
-```
+1. Environment variables are set correctly
+2. All dependencies installed from requirements.txt
+3. Health check endpoint `/health` returns success
+4. Check Railway/Replit logs for detailed error messages
 
-## Performance Optimization
+## Security
 
-### For High Volume Processing
-1. **Use Gunicorn with multiple workers**:
-   ```bash
-   gunicorn -w 4 --worker-class gevent app:app
-   ```
-
-2. **Optimize OCR settings**:
-   - Use normal mode for speed
-   - Process images in smaller batches
-   - Implement image caching
-
-3. **Hardware Requirements**:
-   - Minimum: 2GB RAM, 1 CPU core
-   - Recommended: 4GB RAM, 2+ CPU cores
-   - GPU acceleration (optional for EasyOCR)
-
-### Image Processing Tips
-- **Optimal image resolution**: 300 DPI
-- **File formats**: PNG for best quality, JPEG for smaller files
-- **Image preprocessing**: The app automatically enhances images
-
-## Security Considerations
-
-### For Production Deployment
-1. **Change secret key**:
-   ```bash
-   export SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-   ```
-
-2. **Enable HTTPS** (with reverse proxy like Nginx)
-
-3. **File upload limits**: Already configured (16MB max)
-
-4. **Input validation**: Comprehensive validation included
-
-5. **Rate limiting**: Consider implementing for public deployments
-
-## Support and Maintenance
-
-### Regular Maintenance
-- Clear temp files: `rm -rf temp/*`
-- Rotate logs: `logrotate` configuration
-- Update dependencies: `pip3 install -r requirements.txt --upgrade`
-
-### Monitoring
-- Check `/status` endpoint for health monitoring
-- Monitor disk space in `temp/` and `logs/` directories
-- Track processing times and error rates
-
-## License
-
-This application is provided as-is for educational and commercial use. 
-OCR engines have their own licenses:
-- EasyOCR: Apache 2.0 License
-- PaddleOCR: Apache 2.0 License  
-- Tesseract: Apache 2.0 License
-
-## Version History
-
-- **v1.0** - Initial production release
-- Multiple OCR engine support
-- Web interface and API
-- Production-ready configuration
-- Comprehensive error handling
-
-For updates and support, refer to the application logs and documentation.
+- File size and type validation
+- Secure filename handling
+- No persistent file storage
+- Memory cleanup after processing
+- Production-level error handling

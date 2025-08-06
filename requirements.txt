@@ -1,29 +1,17 @@
-
-# Production OCR Service Requirements
-# Core web framework
+# Optimized OCR Service for Railway Limited Plan
 Flask==3.0.3
 Werkzeug==3.0.3
 
-# Image processing
-opencv-python==4.11.0.86
+# Essential image processing
+opencv-python-headless==4.11.0.86
 Pillow==11.3.0
 numpy==2.3.2
 
-# OCR engines (install what's available)
-# Primary OCR engine - most reliable
+# Primary OCR engine (lightweight)
 easyocr==1.7.1
 
-# Secondary OCR engines - install if available
-paddlepaddle==2.6.0
-paddleocr==2.7.3
+# Backup OCR (optional)
 pytesseract==0.3.10
 
-# Utility packages
-python-dateutil==2.8.2
-
-# Production server (optional - for deployment)
+# Production server
 gunicorn==21.2.0
-
-# Development dependencies (optional)
-pytest==7.4.3
-pytest-flask==1.3.0
